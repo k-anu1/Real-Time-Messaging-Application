@@ -1,7 +1,7 @@
 # 🚀 Real-Time Messaging Application
 
 # pc view
-![alt text](<Screenshot 2026-02-14 at 12.52.17 AM.png>)
+<img width="1162" height="1266" alt="Screenshot 2026-02-14 at 12 52 17 AM" src="https://github.com/user-attachments/assets/cea96590-ddbd-4c0d-8b1c-f5d50dbd3d21" />
 
 ## 📌 Overview
 The Real-Time Messaging Application is a cloud-based system designed to enable reliable and asynchronous communication between distributed services. The system uses Azure cloud services to ensure scalability, fault tolerance, and high performance.
