@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real‑Time Order Processing</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Font for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 700px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #5f2c82, #49a09d);
+            color: white;
+            padding: 30px 30px 20px 30px;
+        }
+
+        .card-header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header h1 i {
+            font-size: 2rem;
+        }
+
+        .card-header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .card-body {
+            padding: 25px 30px;
+        }
+
+        .message-list {
+            background: #f8faff;
+            border-radius: 18px;
+            padding: 15px;
+            max-height: 350px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        /* Custom scrollbar */
+        .message-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        .message-list::-webkit-scrollbar-track {
+            background: #eaeef5;
+            border-radius: 10px;
+        }
+        .message-list::-webkit-scrollbar-thumb {
+            background: #c0c6d2;
+            border-radius: 10px;
+        }
+        .message-list::-webkit-scrollbar-thumb:hover {
+            background: #a0a8b8;
+        }
+
+        .message-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: white;
+            border-radius: 16px;
+            padding: 12px 18px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-item:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            transform: translateY(-2px);
+        }
+
+        .status-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .status-pending .status-icon {
+            background: #fff7e5;
+            color: #f39c12;
+        }
+
+        .status-processed .status-icon {
+            background: #e3f7ec;
+            color: #2ecc71;
+        }
+
+        .message-details {
+            flex: 1;
+        }
+
+        .message-content {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+            font-size: 1rem;
+        }
+
+        .message-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .status-pending .status-badge {
+            background: #fff7e5;
+            color: #e67e22;
+        }
+
+        .status-processed .status-badge {
+            background: #e3f7ec;
+            color: #27ae60;
+        }
+
+        .timestamp {
+            color: #94a3b8;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: #f1f5f9;
+            border-radius: 60px;
+            padding: 5px 5px 5px 20px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+
+        .input-area:focus-within {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            border-color: #6366f1;
+        }
+
+        #messageInput {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 12px 0;
+            font-size: 1rem;
+            color: #1e293b;
+            outline: none;
+        }
+
+        #messageInput::placeholder {
+            color: #94a3b8;
+            font-weight: 300;
+        }
+
+        #sendBtn {
+            background: linear-gradient(135deg, #5f2c82, #49a09d);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(90, 60, 140, 0.3);
+        }
+
+        #sendBtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(90, 60, 140, 0.4);
+        }
+
+        #sendBtn i {
+            margin-left: 2px; /* fine-tune icon position */
+        }
+
+        .info-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .info-text i {
+            color: #49a09d;
+        }
+    </style>
+    <!-- Socket.IO client library -->
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="card">
+        <div class="card-header">
+            <h1>
+                <i class="fas fa-comment-dots"></i>
+                OrderFlow
+            </h1>
+            <p><i class="fas fa-clock" style="margin-right: 6px;"></i>Messages are queued and processed every 5 seconds (simulated).</p>
+            <p><i class="fas fa-check-circle" style="margin-right: 6px;"></i>Real‑time updates via Azure Service Bus pattern.</p>
+        </div>
+        <div class="card-body">
+            <div class="message-list" id="messageList">
+                <!-- Messages will be injected here -->
+            </div>
+            <div class="input-area">
+                <input type="text" id="messageInput" placeholder="Type your order... e.g., 'Pizza Margherita'" autocomplete="off">
+                <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+            <div class="info-text">
+                <i class="fas fa-robot"></i> Background worker processes orders asynchronously
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+
+</body>
+</html>
